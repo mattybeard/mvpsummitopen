@@ -1,6 +1,6 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from '@azure/functions';
 import { ConflictError, createGuess, deleteGuess, listGuesses } from '../store';
-import { CARL, parseGuess } from '../validate';
+import { CARL, LORYAN, parseGuess } from '../validate';
 
 const json = (status: number, body: unknown): HttpResponseInit => ({
   status,
@@ -24,6 +24,7 @@ async function guesses(req: HttpRequest, ctx: InvocationContext): Promise<HttpRe
     const parsed = parseGuess(body);
     if (typeof parsed === 'string') return fail(400, parsed);
     if (parsed.nameKey === CARL) return fail(403, "Shouldn't have half arsed it");
+    if (parsed.nameKey === LORYAN) return fail(403, 'Not until you have AI credits');
 
     const { guess, token } = await createGuess(parsed);
     return json(201, { ...guess, token });

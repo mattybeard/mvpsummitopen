@@ -31,7 +31,7 @@ The API reads its settings from `api/local.settings.json`. That file is not comm
 | `POST` | `/api/guesses` | Adds a guess from `{ name, at, zone }`, where `at` is ISO 8601. Returns the guess and a delete token |
 | `DELETE` | `/api/guesses/{id}` | Removes a guess. Needs the token in the `x-guess-token` header |
 
-The server checks that the name is present and at most 40 characters, the time is in the future and less than about a year away, and the zone is a real IANA zone. Names can't start with `=`, `+`, `-` or `@`, so a spreadsheet won't treat them as formulas if the table is ever exported. The API also refuses Carl Cookson.
+The server checks that the name is present and at most 40 characters, the time is in the future and less than about a year away, and the zone is a real IANA zone. Names can't start with `=`, `+`, `-` or `@`, so a spreadsheet won't treat them as formulas if the table is ever exported. The API also refuses Carl Cookson and Loryan Strant. Submitting as Loryan Strant clears the form and shows "Not until you have AI credits" without saving a guess. The name checks ignore case and extra whitespace.
 
 Each guess is two rows in one table partition. One row is keyed by the guessed UTC minute, and the other claims the lower-cased name. Both rows are written in a single transaction, so a second guess for the same minute or name fails even when both arrive at once.
 

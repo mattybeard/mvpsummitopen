@@ -167,6 +167,15 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (actual !== null || isCarl() || submitting) return;
   const name = fName.value.trim().replace(/\s+/g, ' ');
+  if (name.toLocaleLowerCase('en') === 'loryan strant') {
+    const zone = fZone.value;
+    form.reset();
+    fZone.value = zone;
+    updatePreview();
+    updateSubmitButton();
+    errorEl.textContent = 'Not until you have AI credits';
+    return;
+  }
   const at = formInstant();
   const problem = validate(name, at);
   errorEl.textContent = problem;
