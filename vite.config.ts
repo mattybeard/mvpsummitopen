@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   server: {
-    // Matches how Static Web Apps serves the managed API under /api.
-    proxy: { '/api': 'http://localhost:7071' },
+    // Proxy API routes without intercepting shared modules in api/src.
+    proxy: { '^/api/guesses(?:/|$)': 'http://localhost:7071' },
   },
 });

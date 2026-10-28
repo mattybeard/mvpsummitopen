@@ -259,8 +259,8 @@ h1 em {
 .submit:active {
   transform: translate(2px, 2px);
 }
-.submit.is-carl,
-.submit.is-carl:hover {
+.submit.is-blocked-name,
+.submit.is-blocked-name:hover {
   background: repeating-linear-gradient(-45deg, var(--paper-deep) 0 6px, var(--card) 6px 12px);
   border-color: var(--ink-soft);
   color: var(--ink-soft);

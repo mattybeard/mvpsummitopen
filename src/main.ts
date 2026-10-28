@@ -1,4 +1,5 @@
 import './style.css';
+import { blockedNameMessage, normaliseName } from '../api/src/nameRules';
 import { config } from './config';
 import { fetchGuesses, removeGuess, submitGuess, type Guess } from './data';
 import { initials, renderScale, scrollPinIntoView } from './scale';
@@ -165,15 +166,10 @@ let submitting = false;
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (actual !== null || isCarl() || submitting) return;
-  const name = fName.value.trim().replace(/\s+/g, ' ');
-  if (name.toLocaleLowerCase('en') === 'loryan strant') {
-    const zone = fZone.value;
-    form.reset();
-    fZone.value = zone;
-    updatePreview();
+  if (actual !== null || submitting) return;
+  const name = normaliseName(fName.value);
+  if (blockedNameMessage(name)) {
     updateSubmitButton();
-    errorEl.textContent = 'Not until you have AI credits';
     return;
   }
   const at = formInstant();
@@ -207,14 +203,12 @@ form.addEventListener('submit', async (e) => {
 
 const submitButton = $<HTMLButtonElement>('.submit');
 const SUBMIT_LABEL = submitButton.textContent!;
-const isCarl = () => fName.value.trim().replace(/\s+/g, ' ').toLocaleLowerCase() === 'carl cookson';
-
 function updateSubmitButton() {
   if (actual !== null) return;
-  const carl = isCarl();
-  submitButton.disabled = carl || submitting;
-  submitButton.classList.toggle('is-carl', carl);
-  submitButton.textContent = carl ? "Shouldn't have half arsed it" : submitting ? 'Putting it down…' : SUBMIT_LABEL;
+  const message = blockedNameMessage(fName.value);
+  submitButton.disabled = Boolean(message) || submitting;
+  submitButton.classList.toggle('is-blocked-name', Boolean(message));
+  submitButton.textContent = message ?? (submitting ? 'Putting it down…' : SUBMIT_LABEL);
 }
 
 fName.addEventListener('input', updateSubmitButton);
