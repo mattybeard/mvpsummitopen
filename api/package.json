@@ -1,0 +1,22 @@
+{
+  "name": "mvp-summit-guess-api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "main": "dist/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start --port 7071",
+    "seed": "npm run build && node scripts/seed.mjs"
+  },
+  "dependencies": {
+    "@azure/data-tables": "^13.3.2",
+    "@azure/functions": "^4.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
+  }
+}

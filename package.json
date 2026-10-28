@@ -1,0 +1,23 @@
+{
+  "name": "mvp-summit-guess",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n db,api,web -c gray,blue,green \"npm:dev:db\" \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:db": "azurite --location .azurite --silent --skipApiVersionCheck",
+    "dev:api": "npm --prefix api start",
+    "dev:web": "vite",
+    "seed": "npm --prefix api run seed",
+    "build": "tsc --noEmit && vite build",
+    "build:api": "npm --prefix api run build",
+    "preview": "vite preview",
+    "postinstall": "npm --prefix api install"
+  },
+  "devDependencies": {
+    "azurite": "^3.37.0",
+    "concurrently": "^10.0.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  }
+}
