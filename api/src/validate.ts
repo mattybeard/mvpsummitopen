@@ -1,7 +1,8 @@
+import { nameKey, normaliseName } from './nameRules';
+export { nameKey, normaliseName } from './nameRules';
+
 const MAX_NAME = 40;
 const MAX_AHEAD_MS = 400 * 86_400_000;
-export const CARL = 'carl cookson';
-export const LORYAN = 'loryan strant';
 
 export interface NewGuess {
   name: string;
@@ -9,9 +10,6 @@ export interface NewGuess {
   at: Date;
   zone: string;
 }
-
-export const normaliseName = (name: string) => name.trim().replace(/\s+/g, ' ');
-export const nameKey = (name: string) => normaliseName(name).toLocaleLowerCase('en');
 
 function isZone(zone: string): boolean {
   try {

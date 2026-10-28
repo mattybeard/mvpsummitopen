@@ -6,6 +6,7 @@
   "main": "dist/functions/*.js",
   "scripts": {
     "build": "tsc",
+    "test": "npm run build && node --test test/nameRules.test.cjs",
     "watch": "tsc -w",
     "prestart": "npm run build",
     "start": "func start --port 7071"
