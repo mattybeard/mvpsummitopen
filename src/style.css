@@ -601,6 +601,24 @@ tbody tr.is-winner td {
 tbody tr.is-winner td:first-child {
   color: var(--accent);
 }
+tbody tr.is-lost td {
+  color: var(--muted, #777);
+}
+tbody tr.is-lost td:nth-child(2) {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.loser-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font: 600 10px/16px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
 
 .tag {
   display: inline-block;
