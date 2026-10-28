@@ -8,7 +8,6 @@
     "dev:db": "azurite --location .azurite --silent --skipApiVersionCheck",
     "dev:api": "npm --prefix api start",
     "dev:web": "vite",
-    "seed": "npm --prefix api run seed",
     "build": "tsc --noEmit && vite build",
     "build:api": "npm --prefix api run build",
     "preview": "vite preview",

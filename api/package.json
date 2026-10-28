@@ -8,8 +8,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "prestart": "npm run build",
-    "start": "func start --port 7071",
-    "seed": "npm run build && node scripts/seed.mjs"
+    "start": "func start --port 7071"
   },
   "dependencies": {
     "@azure/data-tables": "^13.3.2",

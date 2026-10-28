@@ -81,15 +81,10 @@ async function exists(table: TableClient, rowKey: string): Promise<GuessEntity |
   }
 }
 
-/**
- * Stores a guess. `placedAt` and `token` are only overridden by the seed script.
- * Returns the stored guess and the token that lets its creator delete it.
- */
-export async function createGuess(
-  guess: NewGuess,
-  placedAt = new Date(),
-  token = randomBytes(24).toString('base64url'),
-): Promise<{ guess: PublicGuess; token: string }> {
+/** Stores a guess and returns it with the token that lets its creator delete it. */
+export async function createGuess(guess: NewGuess): Promise<{ guess: PublicGuess; token: string }> {
+  const placedAt = new Date();
+  const token = randomBytes(24).toString('base64url');
   const table = await getTable();
   const entity: GuessEntity = {
     partitionKey: PARTITION,

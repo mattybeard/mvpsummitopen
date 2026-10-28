@@ -92,20 +92,3 @@ export async function removeGuess(id: string): Promise<void> {
   writeTokens(tokens);
 }
 
-const HEADER = ['name', 'guess_utc', 'timezone', 'submitted_utc'];
-// A leading ' stops Excel and similar apps treating a value as a formula.
-const defuse = (v: string) => (/^[\s\u0000-\u001f]*[=+\-@]/.test(v) ? `'${v}` : v);
-const csvField = (v: string) => {
-  const safe = defuse(v);
-  return /[",\r\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
-};
-
-export function toCsv(guesses: Guess[]): string {
-  const lines = [HEADER.join(',')];
-  for (const g of [...guesses].sort((a, b) => a.placedAt - b.placedAt)) {
-    lines.push(
-      [g.name, new Date(g.at).toISOString(), g.zone, new Date(g.placedAt).toISOString()].map(csvField).join(','),
-    );
-  }
-  return lines.join('\n') + '\n';
-}

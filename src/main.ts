@@ -1,6 +1,6 @@
 import './style.css';
 import { config } from './config';
-import { fetchGuesses, removeGuess, submitGuess, toCsv, type Guess } from './data';
+import { fetchGuesses, removeGuess, submitGuess, type Guess } from './data';
 import { initials, renderScale, scrollPinIntoView } from './scale';
 import {
   allZones,
@@ -101,7 +101,6 @@ app.innerHTML = `
     <section class="board">
       <div class="section-head">
         <h2>The board</h2>
-        <button type="button" class="text-button" id="export">Export CSV</button>
       </div>
       <div class="board-scroll">
         <table id="board"></table>
@@ -218,15 +217,6 @@ viewZoneSelect.addEventListener('change', () => {
   state.viewZone = viewZoneSelect.value;
   localStorage.setItem(VIEW_ZONE_KEY, state.viewZone);
   render();
-});
-
-$('#export').addEventListener('click', () => {
-  const blob = new Blob([toCsv(guesses())], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'guesses.csv';
-  a.click();
-  URL.revokeObjectURL(a.href);
 });
 
 function select(id: string, from: 'scale' | 'board') {
