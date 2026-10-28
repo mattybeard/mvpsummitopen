@@ -1,6 +1,5 @@
 import './style.css';
 import { blockedNameMessage, normaliseName } from '../api/src/nameRules';
-import { config } from './config';
 import { fetchGuesses, removeGuess, submitGuess, type Guess } from './data';
 import { initials, renderScale, scrollPinIntoView } from './scale';
 import {
@@ -28,7 +27,9 @@ const state = {
   loadError: '',
 };
 
-const actual = config.actualOpening ? Date.parse(config.actualOpening) : null;
+let actual: number | null = null;
+
+const isLost = (g: Guess) => g.at <= Date.now() && (actual === null || g.at < actual);
 const zones = allZones();
 const esc = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -269,8 +270,9 @@ function median(values: number[]): number {
 }
 
 function ranked(list: Guess[]): Guess[] {
-  if (actual === null) return [...list].sort((a, b) => a.at - b.at || a.placedAt - b.placedAt);
-  return [...list].sort((a, b) => Math.abs(a.at - actual) - Math.abs(b.at - actual) || a.placedAt - b.placedAt);
+  const target = actual;
+  if (target === null) return [...list].sort((a, b) => a.at - b.at || a.placedAt - b.placedAt);
+  return [...list].sort((a, b) => Math.abs(a.at - target) - Math.abs(b.at - target) || a.placedAt - b.placedAt);
 }
 
 function renderStats(list: Guess[]) {
@@ -289,7 +291,8 @@ function renderStats(list: Guess[]) {
   const cell = (label: string, value: string, note = '') =>
     `<div class="stat"><dt>${label}</dt><dd>${value}${note ? `<small>${note}</small>` : ''}</dd></div>`;
 
-  const items = [cell('Entries', String(list.length))];
+  const lost = list.filter(isLost).length;
+  const items = [cell('Entries', String(list.length)), cell('Lost so far', String(lost), `of ${list.length}`)];
   if (actual !== null) {
     const winner = ranked(list)[0];
     items.push(
@@ -312,6 +315,7 @@ function renderBoard(list: Guess[]) {
   const z = state.viewZone;
   const zoneLabel = `${zoneCity(z)} time`;
   const revealed = actual !== null;
+  const target = actual ?? 0;
   board.classList.toggle('is-revealed', revealed);
   const head = revealed
     ? `<tr><th class="num">Rank</th><th>Name</th><th>Guess (${esc(zoneLabel)})</th><th class="num">Off by</th><th>Entered from</th></tr>`
@@ -331,10 +335,12 @@ function renderBoard(list: Guess[]) {
       lastDay = day;
       group = `<tr class="day-row"><th colspan="5" scope="rowgroup">${formatLongDay(g.at, z)}</th></tr>`;
     }
-    const cls = [g.id === state.selectedId && 'is-selected', g.mine && 'is-mine', revealed && i === 0 && 'is-winner']
+    const cls = [g.id === state.selectedId && 'is-selected', g.mine && 'is-mine',     revealed && i === 0 && 'is-winner', isLost(g) && 'is-lost']
       .filter(Boolean)
       .join(' ');
     const name = `<span class="tag">${esc(initials(g.name))}</span>${esc(g.name)}${
+          isLost(g) ? ' <span class="loser-badge">Loser</span>' : ''
+        }${
       g.mine && !revealed ? ` <button type="button" class="text-button small" data-remove="${g.id}">remove</button>` : ''
     }`;
     const when = `${revealed ? formatDay(g.at, z) + ', ' : ''}<span class="mono">${formatClock(g.at, z)}</span> <span class="muted">${formatZoneAbbr(g.at, z)}</span>`;
@@ -342,8 +348,8 @@ function renderBoard(list: Guess[]) {
     const placed = g.placedAt ? formatDay(g.placedAt, z) : '';
     const cells = revealed
       ? `<td class="num">${i + 1}</td><td>${name}</td><td>${when}</td><td class="num mono">${
-          g.at < actual ? '−' : '+'
-        }${formatDistance(g.at - actual)}</td><td>${from}</td>`
+          g.at < target ? '−' : '+'
+        }${formatDistance(g.at - target)}</td><td>${from}</td>`
       : `<td class="num">${String(entryNo.get(g.id)).padStart(3, '0')}</td><td>${name}</td><td>${when}</td><td>${from}</td><td class="muted">${placed}${
           g.mine ? ' &middot; yours' : ''
         }</td>`;
@@ -366,10 +372,25 @@ function render() {
   updatePreview();
 }
 
-if (actual !== null) {
+function closeEntries() {
+  if (actual === null) return;
   form.classList.add('is-closed');
   for (const el of form.elements) (el as HTMLInputElement).disabled = true;
   $('.submit').textContent = `Closed. Registration opened ${formatFull(actual, state.viewZone)}`;
+}
+
+async function loadWinningTime() {
+  try {
+    const res = await fetch('/api/config', { cache: 'no-store' });
+    if (!res.ok) return;
+    const { winningTime } = (await res.json()) as { winningTime: string | null };
+    const ms = winningTime ? Date.parse(winningTime) : NaN;
+    actual = Number.isNaN(ms) ? null : ms;
+  } catch {
+    // Keep the board in its pre-reveal state if the config cannot be read.
+  }
+  closeEntries();
+  render();
 }
 
 let resizeTimer = 0;
@@ -394,7 +415,10 @@ async function refresh() {
   render();
 }
 
+void loadWinningTime();
 void refresh();
+// Lost marks depend on the clock, so re-render every minute.
+setInterval(render, 60_000);
 // Pick up guesses other people placed while this tab was in the background.
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') void refresh();

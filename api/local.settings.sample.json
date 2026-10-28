@@ -4,6 +4,7 @@
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "TABLES_CONNECTION_STRING": "UseDevelopmentStorage=true",
-    "ENTRIES_CLOSED": "false"
+    "ENTRIES_CLOSED": "false",
+    "WINNING_TIME": ""
   }
 }

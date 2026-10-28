@@ -63,10 +63,12 @@ Optional settings:
 | `GUESSES_TABLE` | `guesses` | Table name |
 | `GUESSES_PARTITION` | `2027` | Partition key. Change it to run a fresh sweepstake next year in the same table |
 | `ENTRIES_CLOSED` | `false` | Set to `true` to stop the API accepting new guesses |
+| `WINNING_TIME` | empty | The real opening time as `dd/mm/yyyy hh:mm` in UTC, for example `02/12/2026 16:00`. Closes entries and reveals the ranking |
 
 ## Revealing the answer
 
-1. Set `ENTRIES_CLOSED` to `true`.
-2. Set `actualOpening` in [src/config.ts](src/config.ts) to the real opening time in UTC, for example `'2026-12-02T16:00:00Z'`, and redeploy.
+Set the `WINNING_TIME` app setting, for example `02/12/2026 16:00`. No redeploy is needed.
 
 The form closes, the board ranks everyone by distance, and the ruler marks the opening time.
+
+Until then, any guess whose time has already passed is marked as lost, and the stats panel shows how many have lost.

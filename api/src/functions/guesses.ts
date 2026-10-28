@@ -2,6 +2,7 @@ import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } 
 import { ConflictError, createGuess, deleteGuess, listGuesses } from '../store';
 import { blockedNameMessage } from '../nameRules';
 import { parseGuess } from '../validate';
+import { parseWinningTime } from '../winningTime';
 
 const json = (status: number, body: unknown): HttpResponseInit => ({
   status,
@@ -14,7 +15,7 @@ async function guesses(req: HttpRequest, ctx: InvocationContext): Promise<HttpRe
   try {
     if (req.method === 'GET') return json(200, await listGuesses());
 
-    if (process.env.ENTRIES_CLOSED === 'true') return fail(403, 'Guessing has closed.');
+    if (process.env.ENTRIES_CLOSED === 'true' || parseWinningTime(process.env.WINNING_TIME) !== null) return fail(403, 'Guessing has closed.');
 
     let body: unknown;
     try {
